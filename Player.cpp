@@ -65,7 +65,7 @@ void Player::update (float _deltaTime) {
     };
 
     // draw gun
-    float drawingGunTime = 0.55f;
+    float drawingGunTime = 0.3f;
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::RShift)) {
         if (STATE != DRAWING_GUN) {
             if (!GunDrawed) {
@@ -88,7 +88,7 @@ void Player::update (float _deltaTime) {
     };
 
     // shoot
-    float shootingGunTime = 0.5f;
+    float shootingGunTime = 0.375f;
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::RControl)) {
         if (GunDrawed && STATE != SHOOTING_GUN) {
             shootingGunDeley = 0.0f;
@@ -311,10 +311,6 @@ void Player::animate (int State, float SwitchTime, unsigned int nbrFrames, bool 
 void Player::draw (sf::RenderWindow& window) {
     window.draw(object);
 };
-
-
-
-
 
 
 
