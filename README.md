@@ -1,16 +1,13 @@
 # A c++ game
 this is a c++ game made with sfml library
 
-### Description
-   * A c++ game
-   * Wrote Under linux os
-
 ### Requirements
 * a c++ compiler
 * SFML library
+* a brain
 
 ## Documentation and examples
-Please refer to the [wiki]
+* Please refer to the wiki
 
 ## Disclaimer :
 * Not liable for any damage incurred from use of this software
