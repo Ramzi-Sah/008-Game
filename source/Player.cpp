@@ -296,7 +296,7 @@ void Player::update (float _deltaTime) {
 
                     if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)){
                         spd = 150.0f * deltaTime;
-                        float switchTime = 0.12f;
+                        switchTime = 0.12f;
                         nbrFrames = 7;
                         STATE = RUNNING;
                     };
@@ -309,7 +309,7 @@ void Player::update (float _deltaTime) {
 
                     if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift) ){
                         spd = 150.0f * deltaTime;
-                        float switchTime = 0.12f;
+                        switchTime = 0.12f;
                         nbrFrames = 7;
                         STATE = RUNNING;
                     };
@@ -322,7 +322,7 @@ void Player::update (float _deltaTime) {
 
                     if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)){
                         spd = 150.0f * deltaTime;
-                        float switchTime = 0.12f;
+                        switchTime = 0.12f;
                         nbrFrames = 7;
                         STATE = RUNNING;
                     };
@@ -335,7 +335,7 @@ void Player::update (float _deltaTime) {
 
                     if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)){
                         spd = 150.0f * deltaTime;
-                        float switchTime = 0.12f;
+                        switchTime = 0.12f;
                         nbrFrames = 7;
                         STATE = RUNNING;
                     };

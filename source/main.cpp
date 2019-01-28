@@ -79,7 +79,7 @@ int main () {
         Ramzi.update (deltaTime);
 
         // update entities
-        for (int i=0; i < Entities.size(); i++){
+        for (unsigned int i=0; i < Entities.size(); i++){
             Entities[i].update(deltaTime);
         };
 
@@ -106,7 +106,7 @@ int main () {
 
         ///////////
         // draw entities
-        for (int i=0; i < Entities.size(); i++){
+        for (unsigned int i=0; i < Entities.size(); i++){
             Entities[i].draw(window);
         };
         //draw player
@@ -125,7 +125,7 @@ std::vector<sf::Texture> loadTextures (std::vector<std::string> texturesData) {
     std::vector<sf::Texture> allTextures;
     sf::Texture texture;
 
-    for (int i=0; i < texturesData.size(); i++){
+    for (unsigned int i=0; i < texturesData.size(); i++){
         texture.loadFromFile(texturesData[i]);
         allTextures.push_back(texture);
     };
@@ -148,7 +148,7 @@ void GameLogic (Player& player, std::vector<sf::Texture> BulletTextures, std::ve
     };
 
     // main entitys loop
-    for (int i=0; i < Entities.size(); i++){
+    for (unsigned int i=0; i < Entities.size(); i++){
         // delete bullets
         if (Entities[i].getPos().x > windowSize.x || Entities[i].getPos().x < 0 ||
             Entities[i].getPos().y > windowSize.y || Entities[i].getPos().y < 0){

@@ -17,7 +17,7 @@ Entity::Entity(sf::Vector2f objectSize, std::vector<sf::Texture> _Textures, int 
 
 void Entity::animate () {
     static int State = 0;
-    static int frame = 0;
+    static unsigned int frame = 0;
     static int _State = 0;
 
     object.setTexture(&Textures[State]);
