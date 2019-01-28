@@ -1,26 +1,26 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <random>
 #include "include/Player.hpp"
 #include "include/Entity.hpp"
 
 // init functions
 std::vector<sf::Texture> loadTextures(std::vector<std::string> texturesData);
-void GameLogic(Player& player, std::vector<sf::Texture> BulletTextures);
+void GameLogic(Player& player, std::vector<sf::Texture> BulletTextures, std::vector<sf::Texture> CoinTextures);
 
 // global vars
+float deltaTime; // frame took time
 sf::Vector2f windowSize(512.0f, 512.0f); // window size
 std::vector<Entity> Entities; // holdes all entities
 
 int main () {
     // init clock
-    float deltaTime;
     sf::Clock clock;
 
     // create windo
     sf::RenderWindow window(sf::VideoMode(windowSize.x, windowSize.y), "008 Game");
 
-    ///******************* Create Player ***************************///
-    // RamziTextures = loadTextures(["data/idle.png", "data/walk.png"]) fuck cpp
+    ///******************* load textures ***************************///
     std::vector<sf::Texture> PlayerTextures = loadTextures(std::vector<std::string>{
         "data/player/idle.png",
         "data/player/walk.png",
@@ -28,6 +28,9 @@ int main () {
         "data/player/jump.png",
 
         "data/player/fall.png",
+        "data/player/hurt.png",
+        "data/player/die.png",
+        "data/player/dead.png",
 
         "data/player/punch.png",
         "data/player/kick.png",
@@ -37,27 +40,26 @@ int main () {
         "data/player/gun/walkingGun.png",
         "data/player/gun/shootingGun.png"
     });
-    // init player
-    Player Ramzi(sf::Vector2f(64.0f, 60.0f), PlayerTextures);
-    // Ramzi.setPos(windowSize.x/2, windowSize.y/2);
-    Ramzi.setPos(windowSize.x/2, 0.0f);
-    ///*************************************************************///
-
-
-
-    ///******************* handle entitys ***************************///
     // create a coin
-    std::vector<sf::Texture> EntityTextures = loadTextures(std::vector<std::string>{
+    std::vector<sf::Texture> CoinTextures = loadTextures(std::vector<std::string>{
         "data/coin.png"
     });
-    Entity coin(sf::Vector2f(16.0f, 16.0f), EntityTextures, 12, 0.05f, "coin");
-    coin.setPos((windowSize.x + 200)/2, windowSize.y/2);
-    Entities.push_back(coin);
-
     // load Bullet texture
     std::vector<sf::Texture> BulletEntityTextures = loadTextures(std::vector<std::string>{
         "data/bullet.png"
     });
+
+
+    ///******************* handle entitys ***************************///
+    // init player
+    Player Ramzi(sf::Vector2f(64.0f, 60.0f), PlayerTextures);
+    // Ramzi.setPos(windowSize.x/2, windowSize.y/2);
+    Ramzi.setPos(windowSize.x/2, 0.0f);
+
+    // spawn a coin
+    Entity coin(sf::Vector2f(16.0f, 16.0f), CoinTextures, 12, 0.05f, "coin");
+    coin.setPos((windowSize.x + 200)/2, windowSize.y/2);
+    Entities.push_back(coin);
 
     ///*************************************************************///
 
@@ -82,7 +84,7 @@ int main () {
         };
 
         // apply Game phisics
-        GameLogic (Ramzi, BulletEntityTextures);
+        GameLogic (Ramzi, BulletEntityTextures, CoinTextures);
 
         // clear window & draw frame
         window.clear(sf::Color::White);
@@ -108,15 +110,6 @@ int main () {
             Entities[i].draw(window);
         };
         //draw player
-
-        // // draw player shape for debug
-        // sf::RectangleShape playerBox;
-        // playerBox.setSize(sf::Vector2f(Ramzi.getSize().x - 20.0f, Ramzi.getSize().y));
-        // playerBox.setOrigin(sf::Vector2f(Ramzi.getSize().x/2 - 20.0f, Ramzi.getSize().y/2));
-        // playerBox.setFillColor(sf::Color(255, 0, 0));
-        // playerBox.setPosition(Ramzi.getPos().x, Ramzi.getPos().y);
-        // window.draw(playerBox);
-
         Ramzi.draw(window);
 
         ///////////
@@ -140,23 +133,44 @@ std::vector<sf::Texture> loadTextures (std::vector<std::string> texturesData) {
     return allTextures;
 };
 
-void GameLogic (Player& player, std::vector<sf::Texture> BulletTextures) {
+void GameLogic (Player& player, std::vector<sf::Texture> BulletTextures, std::vector<sf::Texture> CoinTextures) {
 
+    // create bullets when player is shooting
     if (player.getStateShoot() == true){
         Entity bullet(sf::Vector2f(4.0f, 8.0f), BulletTextures, 12, 10.0f, "bullet");
         bullet.setFacingRight (player.getFacingRight());
-        bullet.setPos(player.getPos().x + 5, player.getPos().y-10);
+        float offset = 20.0f;
+        if (!player.getFacingRight()){
+            offset = -offset;
+        };
+        bullet.setPos(player.getPos().x + offset, player.getPos().y-10);
         Entities.push_back(bullet);
     };
 
-    // check collision with player
+    // main entitys loop
     for (int i=0; i < Entities.size(); i++){
+        // delete bullets
+        if (Entities[i].getPos().x > windowSize.x || Entities[i].getPos().x < 0 ||
+            Entities[i].getPos().y > windowSize.y || Entities[i].getPos().y < 0){
+                Entities.erase(Entities.begin()+i);
+                break;
+        };
+        // check collision with player
         if (Entities[i].checkColision(player)){
-            Entities.erase(Entities.begin()+i);
+            if (Entities[i].getType() == "coin"){
+                Entities.erase(Entities.begin()+i);
+                break;
+            };
+
+            if (Entities[i].getType() == "bullet"){
+                Entities.erase(Entities.begin()+i);
+                player.takeDamage(100.0f);
+                break;
+            };
         };
     };
 
-
+    // check if player bypassing window borders
     if (player.getPos().x > windowSize.x){
         player.setPos(0, player.getPos().y);
     };
@@ -169,5 +183,18 @@ void GameLogic (Player& player, std::vector<sf::Texture> BulletTextures) {
     if (player.getPos().y < 0){
         player.setPos(player.getPos().x, windowSize.y);
     };
+
+    // random spawn coins
+    static float coinSpawnTimer = 5.0f;
+    static float coinSpawnDelay = 0.0f;
+    coinSpawnDelay += deltaTime;
+    if (coinSpawnDelay >= coinSpawnTimer) {
+        coinSpawnDelay = 0.0f;
+        // spawn coin
+        Entity coin(sf::Vector2f(16.0f, 16.0f), CoinTextures, 12, 0.05f, "coin");
+        coin.setPos(windowSize.x/10 * (rand()%10), windowSize.y/10 * (rand()%10));
+        Entities.push_back(coin);
+    };
+
 
 };

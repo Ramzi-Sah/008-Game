@@ -15,7 +15,7 @@ Entity::Entity(sf::Vector2f objectSize, std::vector<sf::Texture> _Textures, int 
     };
 };
 
-void Entity::animate (float SwitchTime, unsigned int nbrFrames, bool FacingRight)  {
+void Entity::animate () {
     static int State = 0;
     static int frame = 0;
     static int _State = 0;
@@ -23,8 +23,8 @@ void Entity::animate (float SwitchTime, unsigned int nbrFrames, bool FacingRight
     object.setTexture(&Textures[State]);
 
     TotalTime += deltaTime;
-    if (TotalTime >= SwitchTime) {
-        TotalTime -= SwitchTime;
+    if (TotalTime >= switchTime) {
+        TotalTime -= switchTime;
         frame++;
         if (frame >= nbrFrames) {
             frame = 0;
@@ -59,7 +59,7 @@ void Entity::draw (sf::RenderWindow& window) {
 };
 
 bool Entity::checkColision (Player player) {
-    float playerEdge = 15.0f;
+    float playerEdge = 15.0f; // because the playerSize.x size is 32 & the player mesh is ~ 10
 
     sf::Vector2f playerSize = player.getSize();
     sf::Vector2f playerPos = player.getPos();
@@ -67,10 +67,7 @@ bool Entity::checkColision (Player player) {
     if ((playerPos.y + playerSize.y - playerSize.y/2) >= object.getPosition().y && (playerPos.y - playerSize.y/2) <= (object.getPosition().y + object.getSize().y/2)) {
         if ((playerPos.x + playerSize.x - playerSize.x/2 - playerEdge) >= object.getPosition().x && (playerPos.x - playerSize.x/2 + playerEdge) <= (object.getPosition().x + object.getSize().x/2)) {
             // collision !
-            if (type == "coin") {
-                return true;
-            };
-
+            return true;
         };
     };
 
@@ -90,7 +87,7 @@ void Entity::update (float _deltaTime) {
         this->move(spd, 0);
     };
 
-    this->animate (switchTime, nbrFrames, FacingRight);
+    this->animate ();
 };
 
 
@@ -106,4 +103,13 @@ void Entity::setPos (float x, float y) {
 
 void Entity::setFacingRight (bool _facingRight) {
     FacingRight = _facingRight;
+};
+
+// getters
+std::string Entity::getType () {
+    return type;
+};
+
+sf::Vector2f Entity::getPos (){
+    return object.getPosition();
 };

@@ -4,16 +4,21 @@
 class Entity {
 public:
     Entity(sf::Vector2f objectSize, std::vector<sf::Texture> _Textures, int nbrFrames, float switchTime, std::string _type);
+    void deleteEntity();
 
     void draw (sf::RenderWindow& window);
     void update (float _deltaTime);
-    void animate (float SwitchTime, unsigned int _nbrFrames, bool _FacingRight);
+    void animate ();
     bool checkColision (Player player);
 
-    // for game logic
+    // mutators
     void move (float x, float y);
     void setPos (float x, float y);
     void setFacingRight (bool _facingRight);
+
+    // getters
+    std::string getType ();
+    sf::Vector2f getPos ();
 
 private:
     float deltaTime;

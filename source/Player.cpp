@@ -61,6 +61,16 @@ void Player::update (float _deltaTime) {
     static float shootingGunDeley = 0.0f;
     static float punchDeley = 0.0f;
     static float kickingDeley = 0.0f;
+    static float dyingDeley = 0.0f;
+    static float takeDamageDeley = 0.0f;
+
+    static float jumpingTime = 0.8f;
+    static float punchingTime = 0.3f;
+    static float kickingTime = 0.3f;
+    static float drawingGunTime = 0.3f;
+    static float shootingGunTime = 0.375f;
+    static float dyingTime = 1.0f;
+    static float takeDamageTime = 0.6f;
 
     static int nbrFrames = 1; // never < 0
     Shoot = false;
@@ -69,82 +79,91 @@ void Player::update (float _deltaTime) {
     float spd = 100.0f * deltaTime;
     float switchTime = 0.15f;
 
-    // calculate jump
-    float jumpingTime = 0.8f;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
-        if (STATE != JUMPING && this->getPos().y > skyLimit){
-            jumpingDeley = 0.0f;
+    if (alive) {
+        // calculate jump
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
+            if (STATE != JUMPING && this->getPos().y > skyLimit){
+                jumpingDeley = 0.0f;
 
-            nbrFrames = 5;
-            switchTime = 0.15f;
-            STATE = JUMPING;
-        };
-
-    };
-
-    // calculate Punch
-    float punchingTime = 0.3f;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-        if (STATE != PUNCHING){
-            punchDeley = 0.0f;
-
-            nbrFrames = 4;
-            switchTime = 0.15f;
-            STATE = PUNCHING;
-        };
-
-    };
-
-    // calculate kick
-    float kickingTime = 0.3f;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::E)) {
-        if (STATE != KICKING){
-            kickingDeley = 0.0f;
-
-            nbrFrames = 4;
-            switchTime = 0.15f;
-            STATE = KICKING;
-        };
-
-    };
-
-    // draw gun
-    float drawingGunTime = 0.3f;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::RShift)) {
-        if (STATE != DRAWING_GUN) {
-            if (!GunDrawed) {
-                drawingGunDeley = 0.0f;
-
-                nbrFrames = 4;
+                nbrFrames = 5;
                 switchTime = 0.15f;
-                STATE = DRAWING_GUN;
-                drawingGunTime = 0.55f;
-            }else {
-                drawingGunDeley = 0.0f;
-
-                nbrFrames = 4;
-                switchTime = 0.15f;
-                STATE = DRAWING_GUN;
-                drawingGunTime = 0.3f; // only 2 frames "hiding weapon"
+                STATE = JUMPING;
             };
         };
 
-    };
+        // calculate Punch
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+            if (STATE != PUNCHING){
+                punchDeley = 0.0f;
 
-    // shoot
-    float shootingGunTime = 0.375f;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::RControl)) {
-        if (GunDrawed && STATE != SHOOTING_GUN) {
-            shootingGunDeley = 0.0f;
+                nbrFrames = 4;
+                switchTime = 0.15f;
+                STATE = PUNCHING;
+            };
+        };
 
-            nbrFrames = 5;
-            switchTime = 0.15f;
-            STATE = SHOOTING_GUN;
+        // calculate kick
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::E)) {
+            if (STATE != KICKING){
+                kickingDeley = 0.0f;
+
+                nbrFrames = 4;
+                switchTime = 0.15f;
+                STATE = KICKING;
+            };
+
+        };
+
+        // draw gun
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::RShift)) {
+            if (STATE != DRAWING_GUN) {
+                if (!GunDrawed) {
+                    drawingGunDeley = 0.0f;
+
+                    nbrFrames = 4;
+                    switchTime = 0.15f;
+                    STATE = DRAWING_GUN;
+                    drawingGunTime = 0.55f;
+                }else {
+                    drawingGunDeley = 0.0f;
+
+                    nbrFrames = 4;
+                    switchTime = 0.15f;
+                    STATE = DRAWING_GUN;
+                    drawingGunTime = 0.3f; // only 2 frames "hiding weapon"
+                };
+            };
+
+        };
+
+        // shoot
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::RControl)) {
+            if (GunDrawed && STATE != SHOOTING_GUN) {
+                shootingGunDeley = 0.0f;
+
+                nbrFrames = 5;
+                switchTime = 0.15f;
+                STATE = SHOOTING_GUN;
+            };
         };
     };
 
     /*----------------------------- Main Key interactions --------------------------------------------*/
-    if (STATE == DRAWING_GUN){
+    if (STATE == DIE || STATE == DEAD) {
+        dyingDeley += deltaTime;
+
+        nbrFrames = 5; // never < 0
+        switchTime = 0.3f;
+        spd = 0.0f;
+        alive = false;
+
+        if (dyingDeley >= dyingTime){
+            STATE = DEAD;
+            nbrFrames = 1; // never < 0
+            switchTime = 0.15f;
+            spd = 0.0f;
+        };
+    } else if (STATE == DRAWING_GUN){
         drawingGunDeley += deltaTime;
 
         // exit drawingGun State
@@ -160,6 +179,22 @@ void Player::update (float _deltaTime) {
                 nbrFrames = 1; // never < 0
             };
         };
+    } else if (STATE == TAKEDAMAGE){
+        takeDamageDeley += deltaTime;
+            nbrFrames = 2; // never < 0
+            switchTime = 0.3f;
+            spd = 0.0f;
+
+        // exit drawingGun State
+        if (takeDamageDeley >= takeDamageTime){
+            // set idle
+            STATE = IDLE;
+            GunDrawed = false;
+            nbrFrames = 1; // never < 0
+            switchTime = 0.15f;
+            spd = 100.0f * deltaTime;
+
+        };
     } else if (GunDrawed){
         /*------------------------------------------ with Gun -------------------------------------*/
         if (STATE == SHOOTING_GUN){
@@ -169,7 +204,6 @@ void Player::update (float _deltaTime) {
                 STATE = IDLE_GUN;
                 nbrFrames = 1; // never < 0
                 switchTime = 0.15f;
-                spd = 100.0f * deltaTime;
 
                 Shoot = true;
             };
@@ -326,8 +360,15 @@ void Player::update (float _deltaTime) {
 
 
 
-
 // mutators
+void Player::takeDamage (float damageAmount) {
+    this->health -= damageAmount;
+    STATE = TAKEDAMAGE;
+    if (health <= 0) {
+        STATE = DIE;
+    };
+};
+
 void Player::move (float x, float y) {
     object.move(x, y);
 };
@@ -335,6 +376,8 @@ void Player::move (float x, float y) {
 void Player::setPos (float x, float y) {
     object.setPosition(x, y);
 };
+
+
 
 // getters
 sf::Vector2f Player::getPos (){

@@ -12,6 +12,8 @@ public:
     // setters
     void move (float x, float y);
     void setPos (float x, float y);
+    void takeDamage (float damageAmount);
+
     // getters
     sf::Vector2f getPos ();
     int getState ();
@@ -25,11 +27,14 @@ private:
     sf::Vector2f playerSize;
     std::vector<sf::Texture> Textures;
 
+    float health = 100.0f;
+    bool alive = true;
+
     bool FacingRight;
     float TotalTime = 0; // for frame time calculation
 
     bool GunDrawed = false;
     bool Shoot = false;
-    enum STATES{IDLE, WALKING, RUNNING, JUMPING, FALLING, PUNCHING, KICKING, IDLE_GUN, DRAWING_GUN, WALKING_GUN, SHOOTING_GUN};
+    enum STATES{IDLE, WALKING, RUNNING, JUMPING, FALLING, TAKEDAMAGE, DIE, DEAD, PUNCHING, KICKING, IDLE_GUN, DRAWING_GUN, WALKING_GUN, SHOOTING_GUN};
     int STATE = IDLE;
 };
