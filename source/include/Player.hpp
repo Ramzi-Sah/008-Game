@@ -1,3 +1,4 @@
+#pragma once
 #include <SFML/Graphics.hpp>
 
 class Player {
@@ -14,6 +15,7 @@ public:
     // getters
     sf::Vector2f getPos ();
     int getState ();
+    sf::Vector2f getSize ();
     bool getFacingRight ();
     bool getStateShoot ();
 
@@ -24,9 +26,10 @@ private:
     std::vector<sf::Texture> Textures;
 
     bool FacingRight;
+    float TotalTime = 0; // for frame time calculation
 
     bool GunDrawed = false;
     bool Shoot = false;
-    enum STATES{IDLE, WALKING, RUNNING, JUMPING, PUNCHING, KICKING, IDLE_GUN, DRAWING_GUN, WALKING_GUN, SHOOTING_GUN};
+    enum STATES{IDLE, WALKING, RUNNING, JUMPING, FALLING, PUNCHING, KICKING, IDLE_GUN, DRAWING_GUN, WALKING_GUN, SHOOTING_GUN};
     int STATE = IDLE;
 };

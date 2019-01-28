@@ -1,4 +1,5 @@
 #include <SFML/Graphics.hpp>
+#include "Player.hpp"
 
 class Entity {
 public:
@@ -7,6 +8,7 @@ public:
     void draw (sf::RenderWindow& window);
     void update (float _deltaTime);
     void animate (float SwitchTime, unsigned int _nbrFrames, bool _FacingRight);
+    bool checkColision (Player player);
 
     // for game logic
     void move (float x, float y);
@@ -23,4 +25,5 @@ private:
     bool FacingRight;
     int nbrFrames;
     float switchTime;
+    float TotalTime = 0; // for frame time calculation
 };

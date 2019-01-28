@@ -8,8 +8,52 @@ Player::Player (sf::Vector2f objectSize, std::vector<sf::Texture> _Textures) {
     FacingRight = true;
 };
 
+void Player::animate (int State, float SwitchTime, unsigned int nbrFrames, bool _FacingRight)  {
+    static int frame = 0;
+    static int _State = 0;
+
+    object.setTexture(&Textures[State]);
+
+    TotalTime += deltaTime;
+    if (TotalTime >= SwitchTime) {
+        TotalTime -= SwitchTime;
+        frame++;
+        if (frame >= nbrFrames) {
+            frame = 0;
+        };
+    };
+
+    // if state changed eg. from walking to jumping
+    if (State != _State) {
+        _State = State;
+        frame = 0;
+    };
+
+    // Cut texture if multiple parts
+    sf::IntRect textureCut;
+    textureCut.height = Textures[State].getSize().y;
+    textureCut.top = 0;
+
+    // calculating texture side
+    if (_FacingRight){
+        textureCut.width = abs(Textures[State].getSize().x / nbrFrames);
+        textureCut.left = abs(textureCut.width * frame);
+    } else {
+        textureCut.width = -abs(Textures[State].getSize().x / nbrFrames);
+        textureCut.left = abs(textureCut.width) * (frame + 1);
+    };
+
+    object.setTextureRect(textureCut);
+};
+
+void Player::draw (sf::RenderWindow& window) {
+    window.draw(object);
+};
+
 void Player::update (float _deltaTime) {
     deltaTime = _deltaTime;
+
+    static float skyLimit = 200.0f;
 
     // get Keyboard input
     static float jumpingDeley = 0.0f;
@@ -28,7 +72,7 @@ void Player::update (float _deltaTime) {
     // calculate jump
     float jumpingTime = 0.8f;
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
-        if (STATE != JUMPING){
+        if (STATE != JUMPING && this->getPos().y > skyLimit){
             jumpingDeley = 0.0f;
 
             nbrFrames = 5;
@@ -191,130 +235,99 @@ void Player::update (float _deltaTime) {
                     nbrFrames = 1; // never < 0
                 };
             };
-        } else if (STATE == PUNCHING){
-            punchDeley += deltaTime;
-            if (punchDeley >= punchingTime){
-                STATE = IDLE;
-                nbrFrames = 1; // never < 0
-            };
-        } else if (STATE == KICKING){
-            kickingDeley += deltaTime;
-            if (kickingDeley >= kickingTime){
-                STATE = IDLE;
-                nbrFrames = 1; // never < 0
-            };
         } else {
-            // IDLE animation
-            STATE = IDLE;
-            nbrFrames = 1; // never < 0
-            spd = 100.0f * deltaTime;
-            switchTime = 0.15f;
-
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || sf::Keyboard::isKeyPressed(sf::Keyboard::Z)) {
-                // animation
-                nbrFrames = 4;
-                STATE = WALKING;
-
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)){
-                    spd = 150.0f * deltaTime;
-                    float switchTime = 0.12f;
-                    nbrFrames = 7;
-                    STATE = RUNNING;
+            if (STATE == PUNCHING){
+                punchDeley += deltaTime;
+                if (punchDeley >= punchingTime){
+                    STATE = IDLE;
+                    nbrFrames = 1; // never < 0
                 };
-                object.move(0.0f, -spd);
-            };
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) || sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-                // animation
-                nbrFrames = 4;
-                STATE = WALKING;
-
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)){
-                    spd = 150.0f * deltaTime;
-                    float switchTime = 0.12f;
-                    nbrFrames = 7;
-                    STATE = RUNNING;
+            } else if (STATE == KICKING){
+                kickingDeley += deltaTime;
+                if (kickingDeley >= kickingTime){
+                    STATE = IDLE;
+                    nbrFrames = 1; // never < 0
                 };
-                object.move(0.0f, spd);
-            };
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) || sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
-                nbrFrames = 4;
-                STATE = WALKING;
-                FacingRight = false;
+            } else {
+                // IDLE animation
+                STATE = IDLE;
+                nbrFrames = 1; // never < 0
+                spd = 100.0f * deltaTime;
+                switchTime = 0.15f;
 
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)){
-                    spd = 150.0f * deltaTime;
-                    float switchTime = 0.12f;
-                    nbrFrames = 7;
-                    STATE = RUNNING;
-                };
-                object.move(-spd, 0.0f);
-            };
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-                nbrFrames = 4;
-                STATE = WALKING;
-                FacingRight = true;
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || sf::Keyboard::isKeyPressed(sf::Keyboard::Z) && this->getPos().y > (skyLimit + 10.0f)) {
+                    // animation
+                    nbrFrames = 4;
+                    STATE = WALKING;
 
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)){
-                    spd = 150.0f * deltaTime;
-                    float switchTime = 0.12f;
-                    nbrFrames = 7;
-                    STATE = RUNNING;
+                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)){
+                        spd = 150.0f * deltaTime;
+                        float switchTime = 0.12f;
+                        nbrFrames = 7;
+                        STATE = RUNNING;
+                    };
+                    object.move(0.0f, -spd);
                 };
-                object.move(spd, 0.0f);
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) || sf::Keyboard::isKeyPressed(sf::Keyboard::S) ) {
+                    // animation
+                    nbrFrames = 4;
+                    STATE = WALKING;
+
+                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift) ){
+                        spd = 150.0f * deltaTime;
+                        float switchTime = 0.12f;
+                        nbrFrames = 7;
+                        STATE = RUNNING;
+                    };
+                    object.move(0.0f, spd);
+                };
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) || sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
+                    nbrFrames = 4;
+                    STATE = WALKING;
+                    FacingRight = false;
+
+                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)){
+                        spd = 150.0f * deltaTime;
+                        float switchTime = 0.12f;
+                        nbrFrames = 7;
+                        STATE = RUNNING;
+                    };
+                    object.move(-spd, 0.0f);
+                };
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+                    nbrFrames = 4;
+                    STATE = WALKING;
+                    FacingRight = true;
+
+                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)){
+                        spd = 150.0f * deltaTime;
+                        float switchTime = 0.12f;
+                        nbrFrames = 7;
+                        STATE = RUNNING;
+                    };
+                    object.move(spd, 0.0f);
+                };
             };
         };
+    };
+
+    // simulate gravity
+    if (this->getPos().y <= skyLimit && STATE != JUMPING) {
+        object.move(0.0f, 9.8 * 20 * deltaTime);
+        STATE = FALLING;
+        nbrFrames = 3; // never < 0
+        switchTime = 0.15f;
     };
 
     // animate player
     this->animate (STATE, switchTime, nbrFrames, FacingRight);
 };
 
-void Player::animate (int State, float SwitchTime, unsigned int nbrFrames, bool _FacingRight)  {
-    static int frame = 0;
-    static float TotalTime = 0;
-    static int _State = 0;
-
-    object.setTexture(&Textures[State]);
-
-    TotalTime += deltaTime;
-    if (TotalTime >= SwitchTime) {
-        TotalTime -= SwitchTime;
-        frame++;
-        if (frame >= nbrFrames) {
-            frame = 0;
-        };
-    };
-
-    // if state changed eg. from walking to jumping
-    if (State != _State) {
-        _State = State;
-        frame = 0;
-    };
-
-    // Cut texture if multiple parts
-    sf::IntRect textureCut;
-    textureCut.height = Textures[State].getSize().y;
-    textureCut.top = 0;
-
-    // calculating texture side
-    if (_FacingRight){
-        textureCut.width = abs(Textures[State].getSize().x / nbrFrames);
-        textureCut.left = abs(textureCut.width * frame);
-    } else {
-        textureCut.width = -abs(Textures[State].getSize().x / nbrFrames);
-        textureCut.left = abs(textureCut.width) * (frame + 1);
-    };
-
-    object.setTextureRect(textureCut);
-};
-
-void Player::draw (sf::RenderWindow& window) {
-    window.draw(object);
-};
 
 
 
-// setters
+
+// mutators
 void Player::move (float x, float y) {
     object.move(x, y);
 };
@@ -330,6 +343,10 @@ sf::Vector2f Player::getPos (){
 
 int Player::getState (){
     return STATE;
+};
+
+sf::Vector2f Player::getSize (){
+    return playerSize;
 };
 
 bool Player::getFacingRight (){

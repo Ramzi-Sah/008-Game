@@ -15,26 +15,9 @@ Entity::Entity(sf::Vector2f objectSize, std::vector<sf::Texture> _Textures, int 
     };
 };
 
-void Entity::update (float _deltaTime) {
-    deltaTime = _deltaTime;
-    static float spd;
-
-    if (type == "bullet") {
-        if (FacingRight) {
-            spd = 300.0f * deltaTime;
-        } else{
-            spd = -300.0f * deltaTime;
-        };
-        this->move(spd, 0);
-    };
-
-    this->animate (switchTime, nbrFrames, FacingRight);
-};
-
 void Entity::animate (float SwitchTime, unsigned int nbrFrames, bool FacingRight)  {
     static int State = 0;
     static int frame = 0;
-    static float TotalTime = 0;
     static int _State = 0;
 
     object.setTexture(&Textures[State]);
@@ -75,6 +58,44 @@ void Entity::draw (sf::RenderWindow& window) {
     window.draw(object);
 };
 
+bool Entity::checkColision (Player player) {
+    float playerEdge = 15.0f;
+
+    sf::Vector2f playerSize = player.getSize();
+    sf::Vector2f playerPos = player.getPos();
+
+    if ((playerPos.y + playerSize.y - playerSize.y/2) >= object.getPosition().y && (playerPos.y - playerSize.y/2) <= (object.getPosition().y + object.getSize().y/2)) {
+        if ((playerPos.x + playerSize.x - playerSize.x/2 - playerEdge) >= object.getPosition().x && (playerPos.x - playerSize.x/2 + playerEdge) <= (object.getPosition().x + object.getSize().x/2)) {
+            // collision !
+            if (type == "coin") {
+                return true;
+            };
+
+        };
+    };
+
+    return false;
+};
+
+void Entity::update (float _deltaTime) {
+    deltaTime = _deltaTime;
+    static float spd;
+
+    if (type == "bullet") {
+        if (FacingRight) {
+            spd = 300.0f * deltaTime;
+        } else{
+            spd = -300.0f * deltaTime;
+        };
+        this->move(spd, 0);
+    };
+
+    this->animate (switchTime, nbrFrames, FacingRight);
+};
+
+
+
+// mutators
 void Entity::move (float x, float y) {
     object.move(x, y);
 };
