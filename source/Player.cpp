@@ -9,7 +9,7 @@ Player::Player (sf::Vector2f objectSize, std::vector<sf::Texture> _Textures) {
 };
 
 void Player::animate (int State, float SwitchTime, unsigned int nbrFrames, bool _FacingRight)  {
-    static int frame = 0;
+    static unsigned int frame = 0;
     static int _State = 0;
 
     object.setTexture(&Textures[State]);
@@ -296,6 +296,7 @@ void Player::update (float _deltaTime) {
 
                     if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)){
                         spd = 150.0f * deltaTime;
+                        switchTime = 0.12f;
                         nbrFrames = 7;
                         switchTime = 0.12f;
                         STATE = RUNNING;
@@ -309,6 +310,7 @@ void Player::update (float _deltaTime) {
 
                     if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift) ){
                         spd = 150.0f * deltaTime;
+                        switchTime = 0.12f;
                         nbrFrames = 7;
                         switchTime = 0.12f;
                         STATE = RUNNING;
@@ -322,6 +324,7 @@ void Player::update (float _deltaTime) {
 
                     if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)){
                         spd = 150.0f * deltaTime;
+                        switchTime = 0.12f;
                         nbrFrames = 7;
                         switchTime = 0.12f;
                         STATE = RUNNING;
@@ -335,7 +338,7 @@ void Player::update (float _deltaTime) {
 
                     if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)){
                         spd = 150.0f * deltaTime;
-                        float switchTime = 0.12f;
+                        switchTime = 0.12f;
                         nbrFrames = 7;
                         switchTime = 0.12f;
                         STATE = RUNNING;
