@@ -289,15 +289,15 @@ void Player::update (float _deltaTime) {
                 spd = 100.0f * deltaTime;
                 switchTime = 0.15f;
 
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || sf::Keyboard::isKeyPressed(sf::Keyboard::Z) && this->getPos().y > (skyLimit + 10.0f)) {
+                if ((sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || sf::Keyboard::isKeyPressed(sf::Keyboard::Z)) && this->getPos().y > (skyLimit + 10.0f)) {
                     // animation
                     nbrFrames = 4;
                     STATE = WALKING;
 
                     if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)){
                         spd = 150.0f * deltaTime;
-                        float switchTime = 0.12f;
                         nbrFrames = 7;
+                        switchTime = 0.12f;
                         STATE = RUNNING;
                     };
                     object.move(0.0f, -spd);
@@ -309,8 +309,8 @@ void Player::update (float _deltaTime) {
 
                     if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift) ){
                         spd = 150.0f * deltaTime;
-                        float switchTime = 0.12f;
                         nbrFrames = 7;
+                        switchTime = 0.12f;
                         STATE = RUNNING;
                     };
                     object.move(0.0f, spd);
@@ -322,8 +322,8 @@ void Player::update (float _deltaTime) {
 
                     if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)){
                         spd = 150.0f * deltaTime;
-                        float switchTime = 0.12f;
                         nbrFrames = 7;
+                        switchTime = 0.12f;
                         STATE = RUNNING;
                     };
                     object.move(-spd, 0.0f);
@@ -337,6 +337,7 @@ void Player::update (float _deltaTime) {
                         spd = 150.0f * deltaTime;
                         float switchTime = 0.12f;
                         nbrFrames = 7;
+                        switchTime = 0.12f;
                         STATE = RUNNING;
                     };
                     object.move(spd, 0.0f);

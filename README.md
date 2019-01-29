@@ -13,7 +13,7 @@
 * collision entity / player
 * gravity simulation
 * fall animation
-* healt / damage / bullet collision
+* health / damage / bullet collision
 
 ## Disclaimer :
 * Not liable for any damage incurred from use of this software
