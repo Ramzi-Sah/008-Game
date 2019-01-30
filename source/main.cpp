@@ -5,12 +5,12 @@
 #include "include/Player.hpp"
 #include "include/Entity.hpp"
 
-// init functions
+/// init functions
 std::vector<sf::Texture> loadTextures(std::vector<std::string> texturesData);
 void createWorld(); // generates new world
 void GameLogic(Player& player, std::vector<sf::Texture> BulletTextures, std::vector<sf::Texture> CoinTextures);
 
-// global vars
+/// global vars
 float deltaTime; // frame took time
 sf::Vector2f windowSize(512.0f, 512.0f); // window size
 std::string gameName = "Windows Jail";
@@ -53,14 +53,19 @@ int main () {
         "data/coin.png"
     });
     // load Bullet texture
-    std::vector<sf::Texture> BulletEntityTextures = loadTextures(std::vector<std::string>{
+    std::vector<sf::Texture> BulletTextures = loadTextures(std::vector<std::string>{
         "data/bullet.png"
+    });
+    // load Bullet texture
+    std::vector<sf::Texture> TreeTextures = loadTextures(std::vector<std::string>{
+        "data/tree.png"
     });
 
     // group all textures inside a vector
     allTextures.push_back(&PlayerTextures);
     allTextures.push_back(&CoinTextures);
-    allTextures.push_back(&BulletEntityTextures);
+    allTextures.push_back(&BulletTextures);
+    allTextures.push_back(&TreeTextures);
 
 
     ///******************* create worlds ***************************///
@@ -74,27 +79,34 @@ int main () {
     World world1(&newWindow1, windowSize, allTextures);
     allWorlds.push_back(world1);
 
-    windowTitle = gameName + " | World: " + std::to_string(allWorlds.size());
-    sf::RenderWindow newWindow2(sf::VideoMode(windowSize.x, windowSize.y), windowTitle, sf::Style::Titlebar);
-    World world2(&newWindow2, windowSize, allTextures);
-    allWorlds.push_back(world2);
-
-    windowTitle = gameName + " | World: " + std::to_string(allWorlds.size());
-    sf::RenderWindow newWindow3(sf::VideoMode(windowSize.x, windowSize.y), windowTitle, sf::Style::Titlebar);
-    World world3(&newWindow3, windowSize, allTextures);
-    allWorlds.push_back(world3);
-
     ///******************* handle entitys ***************************///
     // init player
     Player Ramzi(sf::Vector2f(64.0f, 60.0f), PlayerTextures);
     Ramzi.setPos(windowSize.x/2, 0.0f);
 
-    // spawn a coin
-    Entity coin(sf::Vector2f(16.0f, 16.0f), CoinTextures, 12, 0.05f, "coin");
-    coin.setPos((windowSize.x + 200)/2, windowSize.y/2);
-    Entities.push_back(coin);
+    for (int i = 0; i < 5; i++) {
+        // spawn some trees
+        Entity tree("tree", TreeTextures, rand() % allWorlds.size());
+        tree.setPos(windowSize.x/10 * (rand() % 10), ((windowSize.y - 200)/10 * (rand()%10)) + 200);
+        Entities.push_back(tree);
+    }
 
     ///*************************************************************///
+
+
+    /******************* create world background *************************/
+    // sky
+    sf::RectangleShape sky;
+    sky.setSize(sf::Vector2f(windowSize.x, 200.0f));
+    sky.setFillColor(sf::Color(100, 200, 250));
+    sky.setPosition(0.0f, 0.0f);
+    // earth
+    sf::RectangleShape earth;
+    earth.setSize(sf::Vector2f(windowSize.x, windowSize.y-200.0f));
+    earth.setFillColor(sf::Color(90, 250, 90));
+    earth.setPosition(0.0f, 200.0f);
+    /*********************************************************************/
+
 
     // main Game loop
     while (window.isOpen()) {
@@ -109,30 +121,16 @@ int main () {
         };
 
         // apply Game physics
-        GameLogic (Ramzi, BulletEntityTextures, CoinTextures);
+        GameLogic (Ramzi, BulletTextures, CoinTextures);
 
 
-        ///////////
-        // create sky
-        sf::RectangleShape sky;
-        sky.setSize(sf::Vector2f(windowSize.x, 200.0f));
-        sky.setFillColor(sf::Color(100, 200, 250));
-        sky.setPosition(0.0f, 0.0f);
-        // create earth
-        sf::RectangleShape earth;
-        earth.setSize(sf::Vector2f(windowSize.x, windowSize.y-200.0f));
-        earth.setFillColor(sf::Color(90, 250, 90));
-        earth.setPosition(0.0f, 200.0f);
-
-        // clear window & draw frame
+        // clear window main window
         window.clear(sf::Color::White);
-        window.draw(sky);
-        window.draw(earth);
         // clear all worlds
         for (unsigned int i=0; i < allWorlds.size(); i++){
             if (!allWorlds[i].getWindow()->isOpen()){
                 allWorlds.erase(allWorlds.begin()+i);
-            }else{
+            } else {
                 allWorlds[i].update(deltaTime);
                 allWorlds[i].getWindow()->clear(sf::Color::White);
                 allWorlds[i].getWindow()->draw(sky);
@@ -147,22 +145,36 @@ int main () {
         if (activeWorld > allWorlds.size()-1) {
             activeWorld = 0;
         };
+        Ramzi.setActiveWorld (activeWorld);
 
 
         ///////////////
+
+
         // draw entities
-        for (unsigned int i=0; i < Entities.size(); i++){
-            Entities[i].draw(window);
+        for (unsigned int layer=0; layer < 3; layer++){ // 3 layers / 0, 1, 2
+
+            // draw all entities
+            for (unsigned int i=0; i < Entities.size(); i++){
+                if (Entities[i].getLayer() == layer) {
+                    Entities[i].draw(*allWorlds[Entities[i].getActiveWorld ()].getWindow());
+                };
+            };
+
+            //draw player
+            if (Ramzi.getLayer() == layer) {
+                Ramzi.draw(*allWorlds[activeWorld].getWindow());
+            };
+
+
         };
 
-        //draw player
-        // Ramzi.draw(window);
-        Ramzi.draw(*allWorlds[activeWorld].getWindow());
+
 
         //////////////
-        // display results
+        // draw frame main window
         window.display();
-        // clear all worlds
+        // draw frame all worlds
         for (unsigned int i=0; i < allWorlds.size(); i++){
             allWorlds[i].getWindow()->display();
         };
@@ -189,12 +201,14 @@ std::vector<sf::Texture> loadTextures (std::vector<std::string> texturesData) {
     return allTextures;
 };
 
-// void createWorld () {
+void createWorld () { // problem with local class creation
+
 //     std::string windowTitle = gameName + " | World: " + std::to_string(allWorlds.size());
 //     sf::RenderWindow newWindow(sf::VideoMode(windowSize.x, windowSize.y), windowTitle, sf::Style::Titlebar | sf::Style::Close);
 //     World world(&newWindow, windowSize, allTextures);
 //     allWorlds.push_back(world);
-// };
+
+};
 
 void GameLogic (Player& player, std::vector<sf::Texture> BulletTextures, std::vector<sf::Texture> CoinTextures) {
 
@@ -206,9 +220,10 @@ void GameLogic (Player& player, std::vector<sf::Texture> BulletTextures, std::ve
         Entities[i].update(deltaTime);
     };
 
+
     // create bullets when player is shooting
     if (player.getStateShoot() == true){
-        Entity bullet(sf::Vector2f(4.0f, 8.0f), BulletTextures, 12, 10.0f, "bullet");
+        Entity bullet("bullet", BulletTextures, activeWorld);
         bullet.setFacingRight (player.getFacingRight());
         float offset = 20.0f;
         if (!player.getFacingRight()){
@@ -224,20 +239,38 @@ void GameLogic (Player& player, std::vector<sf::Texture> BulletTextures, std::ve
         if (Entities[i].getPos().x > windowSize.x || Entities[i].getPos().x < 0 ||
             Entities[i].getPos().y > windowSize.y || Entities[i].getPos().y < 0){
                 Entities.erase(Entities.begin()+i);
-                break;
         };
-        // check collision with player
-        if (Entities[i].checkColision(player)){
-            if (Entities[i].getType() == "coin"){
-                Entities.erase(Entities.begin()+i);
-                break;
+
+
+        // chek if player & entity in same world
+        if (Entities[i].getActiveWorld () == activeWorld) {
+
+            // check collision with player
+            if (Entities[i].checkColision(player)){
+                if (Entities[i].getType() == "coin"){
+                    Entities.erase(Entities.begin()+i);
+                    break;
+                };
+                if (Entities[i].getType() == "bullet"){
+                    Entities.erase(Entities.begin()+i);
+                    player.takeDamage(50.0f);
+                    break;
+                };
             };
 
-            if (Entities[i].getType() == "bullet"){
-                Entities.erase(Entities.begin()+i);
-                player.takeDamage(50.0f);
-                break;
+            // reset object layer
+            if (player.getLayer() > Entities[i].getLayer()) {
+                if (player.getPos().y < Entities[i].getPos().y) {
+                    Entities[i].setLayer(2);
+                };
             };
+            if (player.getLayer() < Entities[i].getLayer()) {
+                if (player.getPos().y > Entities[i].getPos().y) {
+                    Entities[i].setLayer(0);
+                };
+            };
+
+
         };
     };
 
@@ -262,14 +295,14 @@ void GameLogic (Player& player, std::vector<sf::Texture> BulletTextures, std::ve
 
 
     // random spawn coins
-    static float coinSpawnTimer = 20.0f;
+    static float coinSpawnTimer = 5.0f;
     static float coinSpawnDelay = 0.0f;
     coinSpawnDelay += deltaTime;
     if (coinSpawnDelay >= coinSpawnTimer) {
         coinSpawnDelay = 0.0f;
         // spawn coin
-        Entity coin(sf::Vector2f(16.0f, 16.0f), CoinTextures, 12, 0.05f, "coin");
-        coin.setPos(windowSize.x/10 * (rand()%10), windowSize.y/10 * (rand()%10));
+        Entity coin("coin", CoinTextures, rand() % allWorlds.size());
+        coin.setPos(windowSize.x/10 * (rand()%10), ((windowSize.y - 200)/10 * (rand()%10)) + 200);
         Entities.push_back(coin);
     };
 

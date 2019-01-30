@@ -6,14 +6,15 @@
 * a c++11 compiler with SFML library
 
 ### To do
-* a map
+* more props
 * some UI
+* object collision
 
 ### Done
 * collision entity / player
-* gravity simulation
-* fall animation
+* gravity simulation / fall animation
 * health / damage / bullet collision
+* more props / fixed some bugs / layers drawing
 
 ## Disclaimer :
 * Not liable for any damage incurred from use of this software

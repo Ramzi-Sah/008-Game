@@ -8,8 +8,7 @@ Player::Player (sf::Vector2f objectSize, std::vector<sf::Texture> _Textures) {
     FacingRight = true;
 };
 
-void Player::animate (int State, float SwitchTime, unsigned int nbrFrames, bool _FacingRight)  {
-    static unsigned int frame = 0;
+void Player::animate (int State, float SwitchTime, unsigned int nbrFrames, bool _FacingRight) {
     static int _State = 0;
 
     object.setTexture(&Textures[State]);
@@ -35,7 +34,7 @@ void Player::animate (int State, float SwitchTime, unsigned int nbrFrames, bool 
     textureCut.top = 0;
 
     // calculating texture side
-    if (_FacingRight){
+    if (_FacingRight) {
         textureCut.width = abs(Textures[State].getSize().x / nbrFrames);
         textureCut.left = abs(textureCut.width * frame);
     } else {
@@ -93,7 +92,7 @@ void Player::update (float _deltaTime) {
 
         // calculate Punch
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-            if (STATE != PUNCHING){
+            if (STATE != PUNCHING) {
                 punchDeley = 0.0f;
 
                 nbrFrames = 4;
@@ -104,7 +103,7 @@ void Player::update (float _deltaTime) {
 
         // calculate kick
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::E)) {
-            if (STATE != KICKING){
+            if (STATE != KICKING) {
                 kickingDeley = 0.0f;
 
                 nbrFrames = 4;
@@ -124,7 +123,7 @@ void Player::update (float _deltaTime) {
                     switchTime = 0.15f;
                     STATE = DRAWING_GUN;
                     drawingGunTime = 0.55f;
-                }else {
+                } else {
                     drawingGunDeley = 0.0f;
 
                     nbrFrames = 4;
@@ -157,36 +156,36 @@ void Player::update (float _deltaTime) {
         spd = 0.0f;
         alive = false;
 
-        if (dyingDeley >= dyingTime){
+        if (dyingDeley >= dyingTime) {
             STATE = DEAD;
             nbrFrames = 1; // never < 0
             switchTime = 0.15f;
             spd = 0.0f;
         };
-    } else if (STATE == DRAWING_GUN){
+    } else if (STATE == DRAWING_GUN) {
         drawingGunDeley += deltaTime;
 
         // exit drawingGun State
-        if (drawingGunDeley >= drawingGunTime){
+        if (drawingGunDeley >= drawingGunTime) {
             if (!GunDrawed) {
                 STATE = IDLE_GUN;
                 nbrFrames = 1; // never < 0
                 GunDrawed = true;
-            }else {
+            } else {
                 GunDrawed = false;
 
                 STATE = IDLE;
                 nbrFrames = 1; // never < 0
             };
         };
-    } else if (STATE == TAKEDAMAGE){
+    } else if (STATE == TAKEDAMAGE) {
         takeDamageDeley += deltaTime;
             nbrFrames = 2; // never < 0
             switchTime = 0.3f;
             spd = 0.0f;
 
         // exit drawingGun State
-        if (takeDamageDeley >= takeDamageTime){
+        if (takeDamageDeley >= takeDamageTime) {
             // set idle
             STATE = IDLE;
             GunDrawed = false;
@@ -195,11 +194,11 @@ void Player::update (float _deltaTime) {
             spd = 100.0f * deltaTime;
 
         };
-    } else if (GunDrawed){
+    } else if (GunDrawed) {
         /*------------------------------------------ with Gun -------------------------------------*/
-        if (STATE == SHOOTING_GUN){
+        if (STATE == SHOOTING_GUN) {
             shootingGunDeley += deltaTime;
-            if (shootingGunDeley >= shootingGunTime){
+            if (shootingGunDeley >= shootingGunTime) {
                 // set idle gun
                 STATE = IDLE_GUN;
                 nbrFrames = 1; // never < 0
@@ -249,14 +248,14 @@ void Player::update (float _deltaTime) {
         /*------------------------------------------ without Gun -------------------------------------*/
         if (STATE == JUMPING){
             jumpingDeley += deltaTime;
-            if (jumpingDeley <= jumpingTime/2){
+            if (jumpingDeley <= jumpingTime/2) {
                 if (FacingRight) {
                     object.move(spd, -spd);
                 } else {
                     object.move(-spd, -spd);
                 };
 
-            }else if (jumpingDeley > jumpingTime/2){
+            }else if (jumpingDeley > jumpingTime/2) {
                 if (FacingRight) {
                     object.move(spd, spd);
                 } else {
@@ -264,7 +263,7 @@ void Player::update (float _deltaTime) {
                 };
 
                 // exit jumping State
-                if (jumpingDeley >= jumpingTime){
+                if (jumpingDeley >= jumpingTime) {
                     STATE = IDLE;
                     nbrFrames = 1; // never < 0
                 };
@@ -272,13 +271,13 @@ void Player::update (float _deltaTime) {
         } else {
             if (STATE == PUNCHING){
                 punchDeley += deltaTime;
-                if (punchDeley >= punchingTime){
+                if (punchDeley >= punchingTime) {
                     STATE = IDLE;
                     nbrFrames = 1; // never < 0
                 };
             } else if (STATE == KICKING){
                 kickingDeley += deltaTime;
-                if (kickingDeley >= kickingTime){
+                if (kickingDeley >= kickingTime) {
                     STATE = IDLE;
                     nbrFrames = 1; // never < 0
                 };
@@ -294,7 +293,7 @@ void Player::update (float _deltaTime) {
                     nbrFrames = 4;
                     STATE = WALKING;
 
-                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)){
+                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
                         spd = 150.0f * deltaTime;
                         switchTime = 0.12f;
                         nbrFrames = 7;
@@ -308,7 +307,7 @@ void Player::update (float _deltaTime) {
                     nbrFrames = 4;
                     STATE = WALKING;
 
-                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift) ){
+                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift) ) {
                         spd = 150.0f * deltaTime;
                         switchTime = 0.12f;
                         nbrFrames = 7;
@@ -322,7 +321,7 @@ void Player::update (float _deltaTime) {
                     STATE = WALKING;
                     FacingRight = false;
 
-                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)){
+                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
                         spd = 150.0f * deltaTime;
                         switchTime = 0.12f;
                         nbrFrames = 7;
@@ -336,7 +335,7 @@ void Player::update (float _deltaTime) {
                     STATE = WALKING;
                     FacingRight = true;
 
-                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)){
+                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
                         spd = 150.0f * deltaTime;
                         switchTime = 0.12f;
                         nbrFrames = 7;
@@ -381,25 +380,37 @@ void Player::setPos (float x, float y) {
     object.setPosition(x, y);
 };
 
+void Player::setActiveWorld (int _activeWorld) {
+    activeWorld = _activeWorld;
+};
+
 
 
 // getters
-sf::Vector2f Player::getPos (){
+sf::Vector2f Player::getPos () {
     return object.getPosition();
 };
 
-int Player::getState (){
+int Player::getState () {
     return STATE;
 };
 
-sf::Vector2f Player::getSize (){
+sf::Vector2f Player::getSize () {
     return playerSize;
 };
 
-bool Player::getFacingRight (){
+bool Player::getFacingRight () {
     return FacingRight;
 };
 
-bool Player::getStateShoot (){
+bool Player::getStateShoot () {
     return Shoot;
+};
+
+int Player::getActiveWorld () {
+    return activeWorld;
+};
+
+int Player::getLayer () {
+    return layer;
 };
