@@ -12,8 +12,9 @@ public:
     // setters
     void move (float x, float y);
     void setPos (float x, float y);
-    void takeDamage (float damageAmount);
+    void takeDamage (int damageAmount);
     void setActiveWorld (int _activeWorld);
+    void addPoint ();
 
     // getters
     sf::Vector2f getPos ();
@@ -23,6 +24,8 @@ public:
     bool getStateShoot ();
     int getActiveWorld ();
     int getLayer ();
+    int getTotalPoints ();
+    int getHealth ();
 
 private:
     float deltaTime;
@@ -30,7 +33,9 @@ private:
     sf::Vector2f playerSize;
     std::vector<sf::Texture> Textures;
 
-    float health = 100.0f;
+    int totalPoints = 0;
+
+    int health = 100;
     bool alive = true;
 
     int activeWorld = 0;

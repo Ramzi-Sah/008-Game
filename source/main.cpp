@@ -14,7 +14,7 @@ void GameLogic(Player& player, std::vector<sf::Texture> BulletTextures, std::vec
 /// global vars
 float deltaTime; // frame took time
 sf::Vector2f windowSize(512.0f, 512.0f); // window size
-std::string gameName = "Windows Jail";
+std::string gameName = "Jailed";
 
 int activeWorld = 0;
 
@@ -115,26 +115,41 @@ int main () {
 
     // text
     sf::Font font;
-    font.loadFromFile("data/FontPixelized.ttf");
+    font.loadFromFile("data/FontPixel.ttf");
 
     sf::Text text;
-    text.setString("Hello  World");
-    text.setPosition(sf::Vector2f(150.0f, 150.0f));
+    text.setString(gameName);
+    text.setPosition(sf::Vector2f(200.0f, 150.0f));
+    text.setCharacterSize(30);
+    text.setFillColor(sf::Color(0, 130, 255));
+
+    sf::Text textTotalHP;
+    textTotalHP.setString("Helth Points: 100");
+    textTotalHP.setPosition(sf::Vector2f(10.0f, 40.0f));
+    textTotalHP.setCharacterSize(15);
+    textTotalHP.setFillColor(sf::Color(255, 0, 130));
+
+    sf::Text textTotalPoints;
+    textTotalPoints.setString("Total Points: 0");
+    textTotalPoints.setPosition(sf::Vector2f(10.0f, 10.0f));
+    textTotalPoints.setCharacterSize(15);
+    textTotalPoints.setFillColor(sf::Color::Black);
+
+
     allTexts.push_back(&text);
+    allTexts.push_back(&textTotalHP);
+    allTexts.push_back(&textTotalPoints);
 
     for (int i = 0; i < allTexts.size(); i++) {
-        allTexts[i]->setCharacterSize(30);
-        allTexts[i]->setFillColor(sf::Color::Red);
         allTexts[i]->setFont(font);
         // allTexts[i]->setStyle(sf::Text::Bold | sf::Text::Underlined);
     };
 
 
-
     // buttons
-    sf::Vector2f button_Size(100.0f, 50.0f);
-    sf::Color button_BgColor = sf::Color(0, 200, 0);
-    sf::Color button_BgColor_Hoovererd = sf::Color(0, 150, 0);
+    sf::Vector2f button_Size(200.0f, 50.0f);
+    sf::Color button_BgColor = sf::Color(255, 70, 0);
+    sf::Color button_BgColor_Hoovererd = sf::Color(220, 40, 0);
     sf::Color button_BgColor_clicked = sf::Color::Green;
 
     sf::RectangleShape button;
@@ -241,7 +256,6 @@ int main () {
         };
         Ramzi.setActiveWorld (activeWorld);
 
-
         ///////////////
         // main window draw ui
         for (int i = 0; i < allButtons.size(); i++) {
@@ -330,6 +344,10 @@ void GameLogic (Player& player, std::vector<sf::Texture> BulletTextures, std::ve
         Entities[i].update(deltaTime);
     };
 
+    // update UI
+    allTexts[1]->setString("Helth Points: " + std::to_string(player.getHealth()));
+    allTexts[2]->setString("Total Points: " + std::to_string( player.getTotalPoints() ));
+
 
     // create bullets when player is shooting
     if (player.getStateShoot() == true){
@@ -359,11 +377,12 @@ void GameLogic (Player& player, std::vector<sf::Texture> BulletTextures, std::ve
             if (Entities[i].checkColision(player)){
                 if (Entities[i].getType() == "coin"){
                     Entities.erase(Entities.begin()+i);
+                    player.addPoint();
                     break;
                 };
                 if (Entities[i].getType() == "bullet"){
                     Entities.erase(Entities.begin()+i);
-                    player.takeDamage(50.0f);
+                    player.takeDamage(50);
                     break;
                 };
             };
@@ -386,20 +405,20 @@ void GameLogic (Player& player, std::vector<sf::Texture> BulletTextures, std::ve
 
     // check if player bypassing window borders
     sf::Vector2f playerPos = player.getPos();
-    if (playerPos.x > windowSize.x){
+    if (playerPos.x > windowSize.x) {
         player.setPos(0, playerPos.y);
         // get to next world
         activeWorld++;
     };
-    if (playerPos.x < 0){
+    if (playerPos.x < 0) {
         player.setPos(windowSize.x, playerPos.y);
         // get to previous world
         activeWorld--;
     };
-    if (playerPos.y > windowSize.y){
+    if (playerPos.y > windowSize.y) {
         player.setPos(playerPos.x, windowSize.y);
     };
-    if (playerPos.y < 0){
+    if (playerPos.y < 0) {
         player.setPos(playerPos.x, windowSize.y);
     };
 

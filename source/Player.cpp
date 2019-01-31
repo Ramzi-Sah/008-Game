@@ -364,7 +364,7 @@ void Player::update (float _deltaTime) {
 
 
 // mutators
-void Player::takeDamage (float damageAmount) {
+void Player::takeDamage (int damageAmount) {
     this->health -= damageAmount;
     STATE = TAKEDAMAGE;
     if (health <= 0) {
@@ -383,6 +383,12 @@ void Player::setPos (float x, float y) {
 void Player::setActiveWorld (int _activeWorld) {
     activeWorld = _activeWorld;
 };
+
+void Player::addPoint () {
+    totalPoints++;
+};
+
+
 
 
 
@@ -413,4 +419,12 @@ int Player::getActiveWorld () {
 
 int Player::getLayer () {
     return layer;
+};
+
+int Player::getTotalPoints () {
+    return totalPoints;
+};
+
+int Player::getHealth () {
+    return health;
 };
