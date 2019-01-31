@@ -12,9 +12,21 @@ void World::update(float deltaTime) {
         // handle os events
         sf::Event evnt;
         while (window->pollEvent(evnt)) {
+            
+            // check if closed
             if (evnt.type == sf::Event::Closed) {
                 window->close();
             };
+
+            // check if focused
+            if (evnt.type == sf::Event::LostFocus) {
+                focused = false;
+            };
+            if (evnt.type == sf::Event::GainedFocus) {
+                focused = true;
+            };
+
+
 
         };
 
@@ -24,6 +36,10 @@ void World::update(float deltaTime) {
 
 
 // getters
-sf::RenderWindow* World::getWindow() {
+sf::RenderWindow* World::getWindow () {
     return window;
+};
+
+bool World::getFocused () {
+    return focused;
 };

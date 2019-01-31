@@ -14,10 +14,14 @@ Entity::Entity(std::string _type, std::vector<sf::Texture> _Textures, int _activ
         EntitySize = sf::Vector2f(16.0f, 16.0f);
         nbrFrames = 12;
         switchTime = 0.05f;
+
+        layer = 2;
     }else if (type == "bullet") {
         EntitySize = sf::Vector2f(4.0f, 8.0f);
         nbrFrames = 1;
         switchTime = 100.0f;
+
+        layer = 2;
     }else if (type == "tree") {
         EntitySize = sf::Vector2f(62.5f, 98.0f);
         nbrFrames = 1;

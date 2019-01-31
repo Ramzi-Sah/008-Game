@@ -7,9 +7,12 @@ public:
 
     //getters
     sf::RenderWindow* getWindow();
+    bool getFocused ();
 
 private:
     sf::RenderWindow* window;
+    bool focused = false;
+
     sf::Vector2f windowSize;
     std::vector<std::vector<sf::Texture>*> textures;
 

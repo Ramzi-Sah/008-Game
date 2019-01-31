@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <random>
+#include <ctime>
 #include "include/World.hpp"
 #include "include/Player.hpp"
 #include "include/Entity.hpp"
@@ -20,9 +21,12 @@ int activeWorld = 0;
 std::vector<World> allWorlds; // holdes all Worlds
 std::vector<std::vector<sf::Texture>*> allTextures; // holdes all textures
 std::vector<Entity> Entities; // holdes all entities
+std::vector<sf::RectangleShape*> allButtons; // holdes all entities
+std::vector<sf::Text*> allTexts; // holdes all entities
 
 int main () {
     // init clock
+    srand (time (0));
     sf::Clock clock;
 
     // create windo
@@ -91,8 +95,6 @@ int main () {
         Entities.push_back(tree);
     }
 
-    ///*************************************************************///
-
 
     /******************* create world background *************************/
     // sky
@@ -105,10 +107,54 @@ int main () {
     earth.setSize(sf::Vector2f(windowSize.x, windowSize.y-200.0f));
     earth.setFillColor(sf::Color(90, 250, 90));
     earth.setPosition(0.0f, 200.0f);
+
+
     /*********************************************************************/
+    // main window UI
+    bool window_focused = false;
+
+    // text
+    sf::Font font;
+    font.loadFromFile("data/FontPixelized.ttf");
+
+    sf::Text text;
+    text.setString("Hello  World");
+    text.setPosition(sf::Vector2f(150.0f, 150.0f));
+    allTexts.push_back(&text);
+
+    for (int i = 0; i < allTexts.size(); i++) {
+        allTexts[i]->setCharacterSize(30);
+        allTexts[i]->setFillColor(sf::Color::Red);
+        allTexts[i]->setFont(font);
+        // allTexts[i]->setStyle(sf::Text::Bold | sf::Text::Underlined);
+    };
 
 
-    // main Game loop
+
+    // buttons
+    sf::Vector2f button_Size(100.0f, 50.0f);
+    sf::Color button_BgColor = sf::Color(0, 200, 0);
+    sf::Color button_BgColor_Hoovererd = sf::Color(0, 150, 0);
+    sf::Color button_BgColor_clicked = sf::Color::Green;
+
+    sf::RectangleShape button;
+    button.setPosition(sf::Vector2f(windowSize.x/2, windowSize.y/2));
+    allButtons.push_back(&button);
+
+    sf::RectangleShape button1;
+    button1.setPosition(sf::Vector2f(windowSize.x/2, windowSize.y/2 + button_Size.y + 10.0f));
+    allButtons.push_back(&button1);
+    for (int i = 0; i < allButtons.size(); i++) {
+        allButtons[i]->setSize(button_Size);
+        allButtons[i]->setFillColor(button_BgColor);
+        allButtons[i]->setOrigin(button_Size.x/2, button_Size.y/2);
+    };
+
+
+
+    /******************************** ************** *************************************/
+    /******************************** main Game loop *************************************/
+    /******************************** ************** *************************************/
     while (window.isOpen()) {
         deltaTime = clock.restart().asSeconds();
 
@@ -118,6 +164,53 @@ int main () {
             if (evnt.type == sf::Event::Closed) {
                 window.close();
             };
+            // check main window if focused
+            if (evnt.type == sf::Event::LostFocus) {
+                window_focused = false;
+            };
+            if (evnt.type == sf::Event::GainedFocus) {
+                window_focused = true;
+            };
+
+            if (window_focused) {
+                if (evnt.type == sf::Event::MouseMoved) {
+                    // on button hoovered
+                    for (int i = 0; i < allButtons.size(); i++) {
+                        if ( (evnt.mouseMove.x + button_Size.x/2 >= allButtons[i]->getPosition().x)
+                            && evnt.mouseMove.x + button_Size.x/2 <= (allButtons[i]->getPosition().x + allButtons[i]->getSize().x)
+                            && (evnt.mouseMove.y + button_Size.y/2 >= allButtons[i]->getPosition().y)
+                            && evnt.mouseMove.y + button_Size.y/2 <= (allButtons[i]->getPosition().y + allButtons[i]->getSize().y)) {
+
+                                allButtons[i]->setFillColor(button_BgColor_Hoovererd);
+                        } else {
+                            allButtons[i]->setFillColor(button_BgColor);
+                        };
+
+                    };
+                };
+                // on clicked button
+                // if (evnt.type == sf::Event::MouseButtonPressed) {
+                //     if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+                //         sf::Vector2i mousePos = sf::Mouse::getPosition();
+                //         // check if button hoovered
+                //         for (int i = 0; i < allButtons.size(); i++) {
+                //             if ( (mousePos.x + button_Size.x/2 >= allButtons[i]->getPosition().x)
+                //                 && (mousePos.x + button_Size.x/2 <= (allButtons[i]->getPosition().x + allButtons[i]->getSize().x))
+                //                 && (mousePos.y + button_Size.y/2 >= allButtons[i]->getPosition().y)
+                //                 && (mousePos.y + button_Size.y/2 <= (allButtons[i]->getPosition().y + allButtons[i]->getSize().y)) ) {
+                //                     // button clicked
+                //                     allButtons[i]->setFillColor(button_BgColor_clicked);
+                //             };
+                //         };
+                //     };
+                // };
+
+
+
+            };
+
+
+
         };
 
         // apply Game physics
@@ -126,6 +219,7 @@ int main () {
 
         // clear window main window
         window.clear(sf::Color::White);
+
         // clear all worlds
         for (unsigned int i=0; i < allWorlds.size(); i++){
             if (!allWorlds[i].getWindow()->isOpen()){
@@ -149,7 +243,13 @@ int main () {
 
 
         ///////////////
-
+        // main window draw ui
+        for (int i = 0; i < allButtons.size(); i++) {
+            window.draw(*allButtons[i]);
+        };
+        for (int i = 0; i < allTexts.size(); i++) {
+            window.draw(*allTexts[i]);
+        };
 
         // draw entities
         for (unsigned int layer=0; layer < 3; layer++){ // 3 layers / 0, 1, 2
@@ -188,7 +288,17 @@ int main () {
     return 0;
 };
 
+
+
+
+
+
+
+
+/*------------------------------------------------ --------- ------------------------------------------------------*/
 /*------------------------------------------------ Functions ------------------------------------------------------*/
+/*------------------------------------------------ --------- ------------------------------------------------------*/
+
 std::vector<sf::Texture> loadTextures (std::vector<std::string> texturesData) {
     std::vector<sf::Texture> allTextures;
     sf::Texture texture;
