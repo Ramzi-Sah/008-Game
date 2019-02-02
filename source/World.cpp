@@ -12,7 +12,7 @@ void World::update(float deltaTime) {
         // handle os events
         sf::Event evnt;
         while (window->pollEvent(evnt)) {
-            
+
             // check if closed
             if (evnt.type == sf::Event::Closed) {
                 window->close();
@@ -34,6 +34,10 @@ void World::update(float deltaTime) {
     };
 };
 
+// mutators
+void World::closeWorld () {
+    window->close();
+};
 
 // getters
 sf::RenderWindow* World::getWindow () {

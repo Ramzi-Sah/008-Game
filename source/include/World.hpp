@@ -8,6 +8,7 @@ public:
     //getters
     sf::RenderWindow* getWindow();
     bool getFocused ();
+    void closeWorld ();
 
 private:
     sf::RenderWindow* window;

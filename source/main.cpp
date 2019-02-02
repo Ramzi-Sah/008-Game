@@ -1,4 +1,5 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/System.hpp>
 #include <iostream>
 #include <random>
 #include <ctime>
@@ -78,10 +79,10 @@ int main () {
     World world(&newWindow, windowSize, allTextures);
     allWorlds.push_back(world);
 
-    windowTitle = gameName + " | World: " + std::to_string(allWorlds.size());
-    sf::RenderWindow newWindow1(sf::VideoMode(windowSize.x, windowSize.y), windowTitle, sf::Style::Titlebar);
-    World world1(&newWindow1, windowSize, allTextures);
-    allWorlds.push_back(world1);
+    // windowTitle = gameName + " | World: " + std::to_string(allWorlds.size());
+    // sf::RenderWindow newWindow1(sf::VideoMode(windowSize.x, windowSize.y), windowTitle, sf::Style::Titlebar);
+    // World world1(&newWindow1, windowSize, allTextures);
+    // allWorlds.push_back(world1);
 
     ///******************* handle entitys ***************************///
     // init player
@@ -113,6 +114,26 @@ int main () {
     // main window UI
     bool window_focused = false;
 
+    // buttons
+    sf::Vector2f button_Size(200.0f, 50.0f);
+    sf::Color button_BgColor = sf::Color(255, 70, 0);
+    sf::Color button_BgColor_Hoovererd = sf::Color(220, 40, 0);
+    sf::Color button_BgColor_clicked = sf::Color(150, 0, 0);
+
+    sf::RectangleShape button;
+    button.setPosition(sf::Vector2f(windowSize.x/2, windowSize.y/2));
+    allButtons.push_back(&button);
+
+    sf::RectangleShape button1;
+    button1.setPosition(sf::Vector2f(windowSize.x/2, windowSize.y/2 + button_Size.y + 10.0f));
+    allButtons.push_back(&button1);
+    for (int i = 0; i < allButtons.size(); i++) {
+        allButtons[i]->setSize(button_Size);
+        allButtons[i]->setFillColor(button_BgColor);
+        allButtons[i]->setOrigin(button_Size.x/2, button_Size.y/2);
+    };
+
+
     // text
     sf::Font font;
     font.loadFromFile("data/FontPixel.ttf");
@@ -122,6 +143,19 @@ int main () {
     text.setPosition(sf::Vector2f(200.0f, 150.0f));
     text.setCharacterSize(30);
     text.setFillColor(sf::Color(0, 130, 255));
+
+    sf::Text Button_1_text;
+    Button_1_text.setString("Jouer");
+    Button_1_text.setPosition(sf::Vector2f(windowSize.x/2 - 40.0f, windowSize.y/2 + button_Size.y - 60.0f));
+    Button_1_text.setCharacterSize(25);
+    Button_1_text.setFillColor(sf::Color::White);
+
+    sf::Text Button_2_text;
+    Button_2_text.setString("Quiter");
+    Button_2_text.setPosition(sf::Vector2f(windowSize.x/2 - 40.0f, windowSize.y/2 + button_Size.y));
+    Button_2_text.setCharacterSize(25);
+    Button_2_text.setFillColor(sf::Color::White);
+
 
     sf::Text textTotalHP;
     textTotalHP.setString("Helth Points: 100");
@@ -139,32 +173,13 @@ int main () {
     allTexts.push_back(&text);
     allTexts.push_back(&textTotalHP);
     allTexts.push_back(&textTotalPoints);
+    allTexts.push_back(&Button_1_text);
+    allTexts.push_back(&Button_2_text);
 
     for (int i = 0; i < allTexts.size(); i++) {
         allTexts[i]->setFont(font);
         // allTexts[i]->setStyle(sf::Text::Bold | sf::Text::Underlined);
     };
-
-
-    // buttons
-    sf::Vector2f button_Size(200.0f, 50.0f);
-    sf::Color button_BgColor = sf::Color(255, 70, 0);
-    sf::Color button_BgColor_Hoovererd = sf::Color(220, 40, 0);
-    sf::Color button_BgColor_clicked = sf::Color::Green;
-
-    sf::RectangleShape button;
-    button.setPosition(sf::Vector2f(windowSize.x/2, windowSize.y/2));
-    allButtons.push_back(&button);
-
-    sf::RectangleShape button1;
-    button1.setPosition(sf::Vector2f(windowSize.x/2, windowSize.y/2 + button_Size.y + 10.0f));
-    allButtons.push_back(&button1);
-    for (int i = 0; i < allButtons.size(); i++) {
-        allButtons[i]->setSize(button_Size);
-        allButtons[i]->setFillColor(button_BgColor);
-        allButtons[i]->setOrigin(button_Size.x/2, button_Size.y/2);
-    };
-
 
 
     /******************************** ************** *************************************/
@@ -204,21 +219,40 @@ int main () {
                     };
                 };
                 // on clicked button
-                // if (evnt.type == sf::Event::MouseButtonPressed) {
-                //     if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-                //         sf::Vector2i mousePos = sf::Mouse::getPosition();
-                //         // check if button hoovered
-                //         for (int i = 0; i < allButtons.size(); i++) {
-                //             if ( (mousePos.x + button_Size.x/2 >= allButtons[i]->getPosition().x)
-                //                 && (mousePos.x + button_Size.x/2 <= (allButtons[i]->getPosition().x + allButtons[i]->getSize().x))
-                //                 && (mousePos.y + button_Size.y/2 >= allButtons[i]->getPosition().y)
-                //                 && (mousePos.y + button_Size.y/2 <= (allButtons[i]->getPosition().y + allButtons[i]->getSize().y)) ) {
-                //                     // button clicked
-                //                     allButtons[i]->setFillColor(button_BgColor_clicked);
-                //             };
-                //         };
-                //     };
-                // };
+                if (evnt.type == sf::Event::MouseButtonPressed || evnt.type == sf::Event::MouseButtonReleased) {
+                        sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+                        // check if button hoovered
+                        for (int i = 0; i < allButtons.size(); i++) {
+                            if ( (mousePos.x + button_Size.x/2 >= allButtons[i]->getPosition().x)
+                                && (mousePos.x + button_Size.x/2 <= (allButtons[i]->getPosition().x + allButtons[i]->getSize().x))
+                                && (mousePos.y + button_Size.y/2 >= allButtons[i]->getPosition().y)
+                                && (mousePos.y + button_Size.y/2 <= (allButtons[i]->getPosition().y + allButtons[i]->getSize().y)) ) {
+                                    if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+                                        // button clicked
+                                        allButtons[i]->setFillColor(button_BgColor_clicked);
+                                        switch (i) {
+                                            case 0:
+                                                createWorld ();
+
+                                                break;
+                                            case 1:
+
+                                                for (unsigned int i=0; i < allWorlds.size(); i++){
+                                                    allWorlds[i].closeWorld ();
+                                                };
+                                                window.close();
+                                                break;
+                                        };
+
+                                    } else {
+                                        allButtons[i]->setFillColor(button_BgColor_Hoovererd);
+
+                            };
+                        };
+
+
+                    };
+                };
 
 
 
@@ -232,29 +266,10 @@ int main () {
         GameLogic (Ramzi, BulletTextures, CoinTextures);
 
 
+        // ---------------------------------------------------------
+
         // clear window main window
         window.clear(sf::Color::White);
-
-        // clear all worlds
-        for (unsigned int i=0; i < allWorlds.size(); i++){
-            if (!allWorlds[i].getWindow()->isOpen()){
-                allWorlds.erase(allWorlds.begin()+i);
-            } else {
-                allWorlds[i].update(deltaTime);
-                allWorlds[i].getWindow()->clear(sf::Color::White);
-                allWorlds[i].getWindow()->draw(sky);
-                allWorlds[i].getWindow()->draw(earth);
-            };
-        };
-
-        // check wich world is active
-        if (activeWorld < 0) {
-            activeWorld = allWorlds.size()-1;
-        };
-        if (activeWorld > allWorlds.size()-1) {
-            activeWorld = 0;
-        };
-        Ramzi.setActiveWorld (activeWorld);
 
         ///////////////
         // main window draw ui
@@ -265,34 +280,60 @@ int main () {
             window.draw(*allTexts[i]);
         };
 
-        // draw entities
-        for (unsigned int layer=0; layer < 3; layer++){ // 3 layers / 0, 1, 2
-
-            // draw all entities
-            for (unsigned int i=0; i < Entities.size(); i++){
-                if (Entities[i].getLayer() == layer) {
-                    Entities[i].draw(*allWorlds[Entities[i].getActiveWorld ()].getWindow());
-                };
-            };
-
-            //draw player
-            if (Ramzi.getLayer() == layer) {
-                Ramzi.draw(*allWorlds[activeWorld].getWindow());
-            };
-
-
-        };
-
-
-
         //////////////
         // draw frame main window
         window.display();
-        // draw frame all worlds
-        for (unsigned int i=0; i < allWorlds.size(); i++){
-            allWorlds[i].getWindow()->display();
-        };
 
+
+
+
+        // ---------------------------------------------------------
+        if (allWorlds.size() > 0) {
+
+            // clear all worlds
+            for (unsigned int i=0; i < allWorlds.size(); i++){
+                if (!allWorlds[i].getWindow()->isOpen()){
+                    allWorlds.erase(allWorlds.begin()+i);
+                } else {
+                    allWorlds[i].update(deltaTime);
+                    allWorlds[i].getWindow()->clear(sf::Color::White);
+                    allWorlds[i].getWindow()->draw(sky);
+                    allWorlds[i].getWindow()->draw(earth);
+                };
+            };
+
+            // check wich world is active
+            if (activeWorld < 0) {
+                activeWorld = allWorlds.size()-1;
+            };
+            if (activeWorld > allWorlds.size()-1) {
+                activeWorld = 0;
+            };
+            Ramzi.setActiveWorld (activeWorld);
+
+            // draw entities
+            for (unsigned int layer=0; layer < 3; layer++){ // 3 layers / 0, 1, 2
+
+                // draw all entities
+                for (unsigned int i=0; i < Entities.size(); i++){
+                    if (Entities[i].getLayer() == layer) {
+                        Entities[i].draw(*allWorlds[Entities[i].getActiveWorld ()].getWindow());
+                    };
+                };
+
+                //draw player
+                if (Ramzi.getLayer() == layer) {
+                    Ramzi.draw(*allWorlds[activeWorld].getWindow());
+                };
+
+
+            };
+
+            // draw frame all worlds
+            for (unsigned int i=0; i < allWorlds.size(); i++){
+                allWorlds[i].getWindow()->display();
+            };
+        };
 
         ////////////////////////////////
         // slow frame rates
@@ -327,10 +368,12 @@ std::vector<sf::Texture> loadTextures (std::vector<std::string> texturesData) {
 
 void createWorld () { // problem with local class creation
 
-//     std::string windowTitle = gameName + " | World: " + std::to_string(allWorlds.size());
-//     sf::RenderWindow newWindow(sf::VideoMode(windowSize.x, windowSize.y), windowTitle, sf::Style::Titlebar | sf::Style::Close);
-//     World world(&newWindow, windowSize, allTextures);
-//     allWorlds.push_back(world);
+    std::cout << "new window is suposed to open" << '\n';
+
+    // std::string windowTitle = gameName + " | World: " + std::to_string(allWorlds.size());
+    // sf::RenderWindow newWindow(sf::VideoMode(windowSize.x, windowSize.y), windowTitle, sf::Style::Titlebar | sf::Style::Close);
+    // World newWorld(&newWindow, windowSize, allTextures);
+    // allWorlds.push_back(world);
 
 };
 
