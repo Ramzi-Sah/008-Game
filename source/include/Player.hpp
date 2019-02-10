@@ -8,6 +8,7 @@ public:
     void draw (sf::RenderWindow& window);
     void update (float _deltaTime);
     void animate (int State, float SwitchTime, unsigned int nbrFrames, bool FacingRight);
+    void revive ();
 
     // setters
     void move (float x, float y);

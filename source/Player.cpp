@@ -78,6 +78,7 @@ void Player::update (float _deltaTime) {
     float spd = 100.0f * deltaTime;
     float switchTime = 0.15f;
 
+
     if (alive) {
         // calculate jump
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
@@ -146,6 +147,7 @@ void Player::update (float _deltaTime) {
             };
         };
     };
+
 
     /*----------------------------- Main Key interactions --------------------------------------------*/
     if (STATE == DIE || STATE == DEAD) {
@@ -348,6 +350,11 @@ void Player::update (float _deltaTime) {
         };
     };
 
+    // reset alive state
+    if (health > 0) {
+        alive = true;
+    };
+
     // simulate gravity
     if (this->getPos().y <= skyLimit && STATE != JUMPING) {
         object.move(0.0f, 9.8 * 20 * deltaTime);
@@ -358,6 +365,12 @@ void Player::update (float _deltaTime) {
 
     // animate player
     this->animate (STATE, switchTime, nbrFrames, FacingRight);
+};
+
+void Player::revive () {
+    this->health = 100.0f;
+    this->setPos(200.0f, 0.0f);
+    // this->alive = true;
 };
 
 

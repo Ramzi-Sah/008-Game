@@ -192,6 +192,9 @@ int main () {
         sf::Event evnt;
         while (window.pollEvent(evnt)) {
             if (evnt.type == sf::Event::Closed) {
+                for (unsigned int i=0; i < allWorlds.size(); i++){
+                    allWorlds[i].closeWorld ();
+                };
                 window.close();
             };
             // check main window if focused
@@ -232,15 +235,15 @@ int main () {
                                         allButtons[i]->setFillColor(button_BgColor_clicked);
                                         switch (i) {
                                             case 0:
-                                                createWorld ();
+                                                Ramzi.revive ();
 
                                                 break;
                                             case 1:
-
                                                 for (unsigned int i=0; i < allWorlds.size(); i++){
                                                     allWorlds[i].closeWorld ();
                                                 };
                                                 window.close();
+
                                                 break;
                                         };
 
