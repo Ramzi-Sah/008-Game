@@ -1,6 +1,7 @@
 # 008 c++ game
 ## Documentation and examples
-* Please refer to the wiki
+* youtube: https://www.youtube.com/watch?v=94g6iWDrRl8 
+* for more information refer to the wiki
 
 ### Requirements
 * a c++11 compiler with SFML library
