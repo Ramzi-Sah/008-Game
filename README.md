@@ -3,6 +3,8 @@
 * youtube: https://www.youtube.com/watch?v=94g6iWDrRl8 
 * for more information refer to the wiki
 
+[![check it on YT](https://img.youtube.com/vi/94g6iWDrRl8/0.jpg)](https://www.youtube.com/watch?v=94g6iWDrRl8)
+
 ### Requirements
 * a c++11 compiler with SFML library
 
